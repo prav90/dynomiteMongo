@@ -89,18 +89,19 @@ struct conn {
     unsigned           connected:1;   /* connected? */
     unsigned           eof:1;         /* eof? aka passive close? */
     unsigned           done:1;        /* done? aka close? */
-    unsigned           redis:1;       /* redis? */
     unsigned           dnode_server:1;       /* dndoe server connection? */
     unsigned           dnode_client:1;  /* dnode client? */
     unsigned           dyn_mode:1;      /* is a dyn connection? */
+
+    int 				data_store;
 };
 
 TAILQ_HEAD(conn_tqh, conn);
 
 struct context *conn_to_ctx(struct conn *conn);
-struct conn *conn_get(void *owner, bool client, bool redis);
+struct conn *conn_get(void *owner, bool client, int data_store);
 struct conn *conn_get_proxy(void *owner);
-struct conn *conn_get_peer(void *owner, bool client, bool redis);
+struct conn *conn_get_peer(void *owner, bool client, int data_store);
 struct conn *conn_get_dnode(void *owner);
 void conn_put(struct conn *conn);
 ssize_t conn_recv(struct conn *conn, void *buf, size_t size);
