@@ -163,7 +163,7 @@ _conn_get(void)
     conn->connected = 0;
     conn->eof = 0;
     conn->done = 0;
-    conn->redis = 0;
+    conn->data_store = 0;
 
     /* for dynomite */
     conn->dnode_client = 0;
@@ -175,7 +175,7 @@ _conn_get(void)
 
 
 struct conn *
-conn_get_peer(void *owner, bool client, bool redis)
+conn_get_peer(void *owner, bool client, int data_store)
 {
     struct conn *conn;
 
@@ -184,7 +184,9 @@ conn_get_peer(void *owner, bool client, bool redis)
         return NULL;
     }
 
-    conn->redis = redis ? 1 : 0;
+    /*** select the data store */
+    //Yannis: conn->redis = redis ? 1 : 0;
+    conn->data_store = data_store;
     conn->dnode_client = client? 1 : 0;   
     conn->dyn_mode = 1;
 
@@ -246,7 +248,7 @@ conn_get_peer(void *owner, bool client, bool redis)
 
 
 struct conn *
-conn_get(void *owner, bool client, bool redis)
+conn_get(void *owner, bool client, int data_store)
 {
     struct conn *conn;
 
@@ -256,7 +258,8 @@ conn_get(void *owner, bool client, bool redis)
     }
 
     /* connection either handles redis or memcache messages */
-    conn->redis = redis ? 1 : 0;
+    // Yannis: conn->redis = redis ? 1 : 0;
+    conn->data_store = data_store;
 
     conn->client = client ? 1 : 0;
     conn->dyn_mode = 0;
@@ -328,7 +331,7 @@ conn_get_dnode(void *owner)
         return NULL;
     }
 
-    conn->redis = pool->redis;
+    conn->data_store = pool->data_store;
 
     conn->dnode_server = 1;
     conn->dyn_mode = 1;
@@ -371,7 +374,7 @@ conn_get_proxy(void *owner)
         return NULL;
     }
 
-    conn->redis = pool->redis;
+    conn->data_store = pool->data_store;
 
     conn->proxy = 1;
     conn->dyn_mode = 0;
