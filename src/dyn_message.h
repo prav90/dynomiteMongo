@@ -232,7 +232,7 @@ struct msg {
     unsigned             first_fragment:1;/* first fragment? */
     unsigned             last_fragment:1; /* last fragment? */
     unsigned             swallow:1;       /* swallow response? */
-    unsigned             redis:1;         /* redis? */
+  // YANNIS unsigned             redis:1;         /* redis? */
     
     //dynomite
     struct dmsg          *dmsg;          /* dyn message */
@@ -246,7 +246,8 @@ struct msg {
                                           */
     unsigned             is_read:1;       /*  0 : write
                                               1 : read */
-
+    //YANNIS
+    int data_store;
 };
 
 TAILQ_HEAD(msg_tqh, msg);
@@ -258,7 +259,7 @@ void msg_tmo_delete(struct msg *msg);
 void msg_init(void);
 rstatus_t msg_clone(struct msg *src, struct mbuf *mbuf_start, struct msg *target);
 void msg_deinit(void);
-struct msg *msg_get(struct conn *conn, bool request, bool redis);
+struct msg *msg_get(struct conn *conn, bool request, int data_store);
 void msg_put(struct msg *msg);
 struct msg *msg_get_error(bool redis, dyn_error_t dyn_err, err_t err);
 void msg_dump(struct msg *msg);
@@ -320,7 +321,7 @@ void remote_req_forward(struct context *ctx, struct conn *c_conn, struct msg *ms
 void local_req_forward(struct context *ctx, struct conn *c_conn, struct msg *msg, uint8_t *key, uint32_t keylen);
 void dnode_peer_req_forward(struct context *ctx, struct conn *c_conn, struct conn *p_conn, struct msg *msg,
                       struct rack *rack, uint8_t *key, uint32_t keylen);
-//void peer_gossip_forward(struct context *ctx, struct conn *conn, bool redis, struct string *data);
-void dnode_peer_gossip_forward(struct context *ctx, struct conn *conn, bool redis, struct mbuf *data);
+//void peer_gossip_forward(struct context *ctx, struct conn *conn, int data_store, struct string *data);
+void dnode_peer_gossip_forward(struct context *ctx, struct conn *conn, int data_store, struct mbuf *data);
 
 #endif

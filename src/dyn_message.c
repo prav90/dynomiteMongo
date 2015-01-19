@@ -41,8 +41,8 @@
  *            +        +            .
  *            |        |            .
  *            /        \            .
- *         Request    Response      .../ dn_mbuf.[ch]  (mesage buffers)
- *      dn_request.c  dn_response.c .../ dn_memcache.c; dn_redis.c (message parser)
+ *         Request    Response      .../ dyn_mbuf.[ch]  (mesage buffers)
+ *      dyn_request.c  dyn_response.c .../ dyn_memcache.c; dyn_redis.c (message parser)
  *
  * Messages in dynomite are manipulated by a chain of processing handlers,
  * where each handler is responsible for taking the input and producing an
@@ -261,7 +261,7 @@ done:
     msg->first_fragment = 0;
     msg->last_fragment = 0;
     msg->swallow = 0;
-    msg->redis = 0;
+    msg->data_store = 0;
 
     //dynomite
     msg->dyn_state = 0;
@@ -272,7 +272,7 @@ done:
 }
 
 struct msg *
-msg_get(struct conn *conn, bool request, bool redis)
+msg_get(struct conn *conn, bool request, int data_store)
 {
     struct msg *msg;
 
@@ -283,9 +283,10 @@ msg_get(struct conn *conn, bool request, bool redis)
 
     msg->owner = conn;
     msg->request = request ? 1 : 0;
-    msg->redis = redis ? 1 : 0;
+    //YANNIS: msg->redis = redis ? 1 : 0;
+    msg->data_store = data_store;
 
-    if (redis) {
+    if (data_store == 0) {
         if (request) {
             if (conn->dyn_mode) {
                msg->parser = dyn_parse_req;
@@ -303,7 +304,7 @@ msg_get(struct conn *conn, bool request, bool redis)
         msg->post_splitcopy = redis_post_splitcopy;
         msg->pre_coalesce = redis_pre_coalesce;
         msg->post_coalesce = redis_post_coalesce;
-    } else {
+    } else if(data_store == 1) {
         if (request) {
             if (conn->dyn_mode) {
                msg->parser = dyn_parse_req;
@@ -322,6 +323,25 @@ msg_get(struct conn *conn, bool request, bool redis)
         msg->pre_coalesce = memcache_pre_coalesce;
         msg->post_coalesce = memcache_post_coalesce;
     }
+    else{
+        if (request) {
+            if (conn->dyn_mode) {
+               msg->parser = dyn_parse_req;
+            } else {
+               msg->parser = mongo_parse_req;
+            }
+        } else {
+            if (conn->dyn_mode) {
+               msg->parser = dyn_parse_rsp;
+            } else {
+               msg->parser = mongo_parse_rsp;
+            }
+        }
+        msg->pre_splitcopy = mongo_pre_splitcopy;
+        msg->post_splitcopy = mongo_post_splitcopy;
+        msg->pre_coalesce = mongo_pre_coalesce;
+        msg->post_coalesce = mongo_post_coalesce;
+    }
 
     log_debug(LOG_VVERB, "get msg %p id %"PRIu64" request %d owner sd %d",
               msg, msg->id, msg->request, conn->sd);
@@ -334,7 +354,7 @@ msg_clone(struct msg *src, struct mbuf *mbuf_start, struct msg *target)
 {
     target->owner = src->owner;
     target->request = src->request;
-    target->redis = src->redis;
+    target->data_store = src->data_store;
 
     target->parser = src->parser;
     target->pre_splitcopy = src->pre_splitcopy;
@@ -374,13 +394,13 @@ msg_clone(struct msg *src, struct mbuf *mbuf_start, struct msg *target)
 
 
 struct msg *
-msg_get_error(bool redis, dyn_error_t dyn_err, err_t err)
+msg_get_error(int data_store, dyn_error_t dyn_err, err_t err)
 {
     struct msg *msg;
     struct mbuf *mbuf;
     int n;
     char *errstr = err ? strerror(err) : "unknown";
-    char *protstr = redis ? "-ERR" : "SERVER_ERROR";
+    char *protstr = data_store ? "-ERR" : "SERVER_ERROR";
     char *source;
 
     if (dyn_err == PEER_CONNECTION_REFUSE) {
@@ -519,7 +539,7 @@ msg_parsed(struct context *ctx, struct conn *conn, struct msg *msg)
         return DN_ENOMEM;
     }
 
-    nmsg = msg_get(msg->owner, msg->request, conn->redis);
+    nmsg = msg_get(msg->owner, msg->request, conn->data_store);
     if (nmsg == NULL) {
         mbuf_put(nbuf);
         return DN_ENOMEM;
@@ -557,7 +577,7 @@ msg_fragment(struct context *ctx, struct conn *conn, struct msg *msg)
         return status;
     }
 
-    nmsg = msg_get(msg->owner, msg->request, msg->redis);
+    nmsg = msg_get(msg->owner, msg->request, msg->data_store);
     if (nmsg == NULL) {
         mbuf_put(nbuf);
         return DN_ENOMEM;
