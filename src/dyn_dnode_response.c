@@ -147,7 +147,7 @@ dnode_rsp_gos_syn(struct context *ctx, struct conn *p_conn, struct msg *msg)
 	msg->done = 1;
 
 	//TODOs: need to free the old msg object
-	pmsg = msg_get(p_conn, 0, msg->redis);
+	pmsg = msg_get(p_conn, 0, msg->data_store);
 	if (pmsg == NULL) {
 		mbuf_put(nbuf);
 		return;

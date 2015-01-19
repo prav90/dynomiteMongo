@@ -317,11 +317,13 @@ dyn_parse_req(struct msg *r)
 		}
 
 
-
-		if (r->redis)
+		if(r->data_store==0){
 			return redis_parse_req(r);
-
-		return memcache_parse_req(r);
+		}
+		else if(r->data_store==1){
+			return memcache_parse_req(r);
+		}
+		return mongo_parse_req(r);
 	}
 
 	//bad case
@@ -343,12 +345,14 @@ void dyn_parse_rsp(struct msg *r)
 			return;
 		}
 
-
-
-		if (r->redis)
+		if(r->data_store==0){
 			return redis_parse_rsp(r);
+		}
+		else if(r->data_store==1){
+			return memcache_parse_rsp(r);
+		}
+		return mongo_parse_rsp(r);
 
-		return memcache_parse_rsp(r);
 	}
 
 	//bad case

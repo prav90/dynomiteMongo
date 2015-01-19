@@ -32,7 +32,7 @@ req_get(struct conn *conn)
 
     ASSERT((conn->client && !conn->proxy) || (conn->dnode_client && !conn->dnode_server));
 
-    msg = msg_get(conn, true, conn->redis);
+    msg = msg_get(conn, true, conn->data_store);
     if (msg == NULL) {
         conn->err = errno;
     }
@@ -521,7 +521,7 @@ static bool
 request_send_to_all_racks(struct msg *msg) {
     msg_type_t t = msg->type;
 
-    if (msg->redis) {
+    if (msg->data_store == 0) {
         return t == MSG_REQ_REDIS_SET || t == MSG_REQ_REDIS_DEL || t == MSG_REQ_REDIS_DECR || t == MSG_REQ_REDIS_HDEL ||
         	   t == MSG_REQ_REDIS_HSET || t == MSG_REQ_REDIS_INCR || t == MSG_REQ_REDIS_LPOP || t == MSG_REQ_REDIS_LREM ||
         	   t == MSG_REQ_REDIS_LSET || t == MSG_REQ_REDIS_RPOP || t == MSG_REQ_REDIS_SADD || t == MSG_REQ_REDIS_SPOP ||
@@ -613,7 +613,7 @@ req_forward(struct context *ctx, struct conn *c_conn, struct msg *msg)
             
             // clone the msg struct if not the current rack/dc
             if (string_compare(rack->name, &pool->rack) != 0 && string_compare(rack->dc, &pool->dc)) {
-                rack_msg = msg_get(c_conn, msg->request, msg->redis);
+                rack_msg = msg_get(c_conn, msg->request, msg->data_store);
                 if (rack_msg == NULL) {
                     log_debug(LOG_VERB, "whelp, looks like yer screwed now, buddy. no inter-rack messages for you!");
                     continue;

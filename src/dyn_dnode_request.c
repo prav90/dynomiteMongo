@@ -327,10 +327,10 @@ dnode_peer_req_forward(struct context *ctx, struct conn *c_conn, struct conn *p_
 /*
  //for sending a string over to a peer
 void
-peer_gossip_forward1(struct context *ctx, struct conn *conn, bool redis, struct string *data)
+peer_gossip_forward1(struct context *ctx, struct conn *conn, bool data_store, struct string *data)
 {
 	rstatus_t status;
-	struct msg *msg = msg_get(conn, 1, redis);
+	struct msg *msg = msg_get(conn, 1, data_store);
 
 	if (msg == NULL) {
 		log_debug(LOG_DEBUG, "Unable to obtain a msg");
@@ -371,10 +371,10 @@ peer_gossip_forward1(struct context *ctx, struct conn *conn, bool redis, struct 
  * Sending a mbuf of gossip data over the wire for a peer
  */
 void
-dnode_peer_gossip_forward(struct context *ctx, struct conn *conn, bool redis, struct mbuf *mbuf)
+dnode_peer_gossip_forward(struct context *ctx, struct conn *conn, int data_store, struct mbuf *mbuf)
 {
 	rstatus_t status;
-	struct msg *msg = msg_get(conn, 1, redis);
+	struct msg *msg = msg_get(conn, 1, data_store);
 
 	if (msg == NULL) {
 		log_debug(LOG_DEBUG, "Unable to obtain a msg");

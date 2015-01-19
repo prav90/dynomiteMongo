@@ -188,9 +188,17 @@ dnode_each_init(void *elem, void *data)
         return status;
     }
 
+    char log_datastore = "mongo";
+    if(pool->data==0){
+    	char_logstore="redis";
+    }
+    else if(pool->data == 1){
+    	char_logstore="memcache";
+   }
+
     log_debug(LOG_NOTICE, "dyn: p %d listening on '%.*s' in %s pool %"PRIu32" '%.*s'"
               " with %"PRIu32" servers", p->sd, pool->addrstr.len,
-              pool->d_addrstr.data, pool->redis ? "redis" : "memcache",
+              pool->d_addrstr.data, log_datastore,
               pool->idx, pool->name.len, pool->name.data,
               array_n(&pool->server));
     return DN_OK;
@@ -284,7 +292,7 @@ dnode_accept(struct context *ctx, struct conn *p)
     }
 
     log_debug(LOG_NOTICE, "dyn: accept on sd  %d", sd);
-    c = conn_get_peer(p->owner, true, p->redis);
+    c = conn_get_peer(p->owner, true, p->data_store);
     if (c == NULL) {
         log_error("dyn: get conn client peer for c %d from p %d failed: %s", sd, p->sd,
                   strerror(errno));
