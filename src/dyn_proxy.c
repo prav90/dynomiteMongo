@@ -204,11 +204,31 @@ proxy_each_init(void *elem, void *data)
         return status;
     }
 
-    log_debug(LOG_NOTICE, "p %d listening on '%.*s' in %s pool %"PRIu32" '%.*s'"
+   /* YANNIS: log_debug(LOG_NOTICE, "p %d listening on '%.*s' in %s pool %"PRIu32" '%.*s'"
               " with %"PRIu32" servers", p->sd, pool->addrstr.len,
-              pool->addrstr.data, pool->redis ? "redis" : "memcache",
+              pool->addrstr.data,
+              pool->redis ? "redis" : "memcache",
               pool->idx, pool->name.len, pool->name.data,
               array_n(&pool->server));
+   */
+    // YANNIS: determining which to write to the debug
+    char logging_datastore = "mongo";
+    if(pool->data_store==0){
+    	logging_datastore = "redis";
+    }
+    else if(pool->data_store==1){
+    	logging_datastore = "memcache";
+    }
+    else{
+    	logging_datastore = "mongo";
+    }
+
+    log_debug(LOG_NOTICE, "p %d listening on '%.*s' in %s pool %"PRIu32" '%.*s'"
+                  " with %"PRIu32" servers", p->sd, pool->addrstr.len,
+                  pool->addrstr.data,
+                  logging_datastore,
+                  pool->idx, pool->name.len, pool->name.data,
+                  array_n(&pool->server));
 
     return DN_OK;
 }
@@ -299,7 +319,7 @@ proxy_accept(struct context *ctx, struct conn *p)
         break;
     }
 
-    c = conn_get(p->owner, true, p->redis);
+    c = conn_get(p->owner, true, p->data_store);
     if (c == NULL) {
         log_error("get conn for c %d from p %d failed: %s", sd, p->sd,
                   strerror(errno));
