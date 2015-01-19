@@ -146,7 +146,7 @@ struct server_pool {
     uint32_t           server_failure_limit; /* server failure limit */
     unsigned           auto_eject_hosts:1;   /* auto_eject_hosts? */
     unsigned           preconnect:1;         /* preconnect? */
-    unsigned           redis:1;              /* redis? */
+   // unsigned           redis:1;              /* redis? */
     /* dynomite */
     struct string      seed_provider;
     struct array       seeds;                /*dyn seeds */
@@ -168,6 +168,9 @@ struct server_pool {
     int                g_interval;           /* gossip interval */
     struct string      dc;                   /* server's dc */
     struct string      env;                  /* aws, network, ect */
+
+    /* Yannis */
+    int data_store;
 
 };
 
