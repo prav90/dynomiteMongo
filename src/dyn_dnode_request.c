@@ -19,7 +19,7 @@ dnode_req_get(struct conn *conn)
 
 	ASSERT(conn->dnode_client && !conn->dnode_server);
 
-	msg = msg_get(conn, true, conn->redis);
+	msg = msg_get(conn, true, conn->data_store);
 	if (msg == NULL) {
 		conn->err = errno;
 	}
