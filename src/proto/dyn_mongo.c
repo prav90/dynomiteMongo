@@ -31,3 +31,15 @@
 
 #include "../dyn_core.h"
 #include "dyn_proto.h"
+
+
+void
+redis_parse_req(struct msg *r)
+{
+    struct mbuf *b;
+    uint8_t *p, *m;
+    uint8_t ch;
+
+
+
+}
