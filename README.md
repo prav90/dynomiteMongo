@@ -4,7 +4,9 @@
 ![](images/dynomite-logo.png?raw=true =150x150) </br>
 **Dynomite**, inspired by Dynamo whitepaper, is a thin, distributed dynamo layer for different storages and protocols. 
 
-When Dynomite team decided to settle on using C language, we found Twemproxy and did a fork in order to provide more features than just being a proxy layer.
+When Dynomite team decided to settle on using C language, we found Twemproxy and did a fork in order to provide more features than just being a proxy layer. Ioannis Papapanagiotou has updated Dynomite with the capability to talk to mongo.
+
+
 
 
 ## Build
@@ -64,7 +66,7 @@ Dynomite can be configured through a YAML file specified by the -c or --conf-fil
 + **listen**: The listening address and port (name:port or ip:port) for this server pool.
 + **timeout**: The timeout value in msec that we wait for to establish a connection to the server or receive a response from a server. By default, we wait indefinitely.
 + **preconnect**: A boolean value that controls if dynomite should preconnect to all the servers in this pool on process start. Defaults to false.
-+ **redis**: A boolean value that controls if a server pool speaks redis or memcached protocol. Defaults to false.
++ **data_store**: An integer value hat controls if a server pool speaks redis (0) or memcached (1) or mongo (2) protocol. Defaults to 0.
 + **server_connections**: The maximum number of connections that can be opened to each server. By default, we open at most 1 server connection.
 + **auto_eject_hosts**: A boolean value that controls if server should be ejected temporarily when it fails consecutively server_failure_limit times. See [liveness recommendations](notes/recommendation.md#liveness) for information. Defaults to false.
 + **server_retry_timeout**: The timeout value in msec to wait for before retrying on a temporarily ejected server, when auto_eject_host is set to true. Defaults to 30000 msec.
