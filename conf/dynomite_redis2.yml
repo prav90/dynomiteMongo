@@ -13,7 +13,7 @@ dyn_o_mite:
   listen: 127.0.0.2:8102
   preconnect: true
   server_retry_timeout: 200000
-  redis: true
+  data_store: 0
   servers:
   - 127.0.0.1:28527:1
   timeout: 10000

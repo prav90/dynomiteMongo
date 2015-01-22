@@ -9,4 +9,4 @@ dyn_o_mite:
   - 127.0.0.2:8101:localrack:localdc:437425602
   servers:
   - 127.0.0.1:6379:1
-  redis: true
+  data_store: 0
