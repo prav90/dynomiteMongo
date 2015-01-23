@@ -34,6 +34,13 @@
  * length limit of a key is set at 250 characters (of course, normally
  * clients wouldn't need to use such long keys); the key must not include
  * control characters or whitespace.
+ *
+ * Yannis: The standard memcache protocol has
+ * 1. A key up to 250 bytes in length
+ * 2. 32 bit "flag" value
+ * 3. An expiration time, in seconds. Can be up to 30 days
+ * 4. 64 bit "CAS" value, which is kept unique
+ * 5. Arbitrary Data
  */
 #define MEMCACHE_MAX_KEY_LENGTH 250
 
@@ -63,6 +70,7 @@ memcache_storage(struct msg *r)
 /*
  * Return true, if the memcache command is a cas command, otherwise
  * return false
+ * Yannis cas: check and set (or compare and swap)
  */
 static bool
 memcache_cas(struct msg *r)

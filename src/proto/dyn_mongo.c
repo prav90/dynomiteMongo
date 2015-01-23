@@ -32,6 +32,12 @@
 #include "../dyn_core.h"
 #include "dyn_proto.h"
 
+/*
+ * Yannnis
+ *
+ * From MongoDB wire protocol specification
+ *
+ */
 
 void
 redis_parse_req(struct msg *r)
