@@ -170,7 +170,7 @@ memcache_parse_req(struct msg *r)
     b = STAILQ_LAST(&r->mhdr, mbuf, next);
 
     ASSERT(r->request);
-    ASSERT(!r->redis);
+    ASSERT(r->redis==1);
     ASSERT(state >= SW_START && state < SW_SENTINEL);
     ASSERT(b != NULL);
     ASSERT(b->pos <= b->last);
@@ -766,7 +766,7 @@ memcache_parse_rsp(struct msg *r)
     b = STAILQ_LAST(&r->mhdr, mbuf, next);
 
     ASSERT(!r->request);
-    ASSERT(!r->redis);
+    ASSERT(r->redis==1);
     ASSERT(state >= SW_START && state < SW_SENTINEL);
     ASSERT(b != NULL);
     ASSERT(b->pos <= b->last);
@@ -1205,7 +1205,7 @@ memcache_pre_splitcopy(struct mbuf *mbuf, void *arg)
     struct string gets = string("gets "); /* 'gets ' string */
 
     ASSERT(r->request);
-    ASSERT(!r->redis);
+    ASSERT(r->redis==1);
     ASSERT(mbuf_empty(mbuf));
 
     switch (r->type) {
@@ -1233,7 +1233,7 @@ memcache_post_splitcopy(struct msg *r)
     struct string crlf = string(CRLF);
 
     ASSERT(r->request);
-    ASSERT(!r->redis);
+    ASSERT(r->redis==1);
     ASSERT(!STAILQ_EMPTY(&r->mhdr));
 
     mbuf = STAILQ_LAST(&r->mhdr, mbuf, next);
