@@ -40,12 +40,49 @@
  */
 
 void
-redis_parse_req(struct msg *r)
+mongo_parse_req(struct msg *r)
 {
     struct mbuf *b;
     uint8_t *p, *m;
     uint8_t ch;
+    enum {
+        SW_START,
+        SW_SENTINEL
+    }state;
 
+    state = r->state;
+    b = STAILQ_LAST(&r->mhdr, mbuf, next);
 
+    ASSERT(r->request);
+    ASSERT(r->redis==2);
+    ASSERT(state >= SW_START && state < SW_SENTINEL);
+    ASSERT(b != NULL);
+    ASSERT(b->pos <= b->last);
+
+    /* validate the parsing maker */
+    ASSERT(r->pos != NULL);
+    ASSERT(r->pos >= b->pos && r->pos <= b->last);
+
+    for (p = r->pos; p < b->last; p++) {
+        ch = *p;
+
+        switch (state) {
+        	case SW_START:
+
+            case SW_SENTINEL:
+            default:
+                NOT_REACHED();
+                break;
+         }
+    }
+
+}
+
+void
+mongo_parse_rsp(struct msg *r)
+{
+    struct mbuf *b;
+    uint8_t *p, *m;
+    uint8_t ch;
 
 }
