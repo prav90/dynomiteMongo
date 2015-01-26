@@ -521,7 +521,7 @@ static bool
 request_send_to_all_racks(struct msg *msg) {
     msg_type_t t = msg->type;
 
-    /* Yannis: Need to add the Mongo messages here */
+    /* Yannis: modified the data store argument for 3 backends */
 
     if (msg->data_store == 0) {
         return t == MSG_REQ_REDIS_SET || t == MSG_REQ_REDIS_DEL || t == MSG_REQ_REDIS_DECR || t == MSG_REQ_REDIS_HDEL ||
