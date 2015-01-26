@@ -324,6 +324,7 @@ msg_get(struct conn *conn, bool request, int data_store)
         msg->post_coalesce = memcache_post_coalesce;
     }
     else{
+    	/* YANNIS: Added mongo information */
         if (request) {
             if (conn->dyn_mode) {
                msg->parser = dyn_parse_req;
