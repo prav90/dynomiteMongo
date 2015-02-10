@@ -1,8 +1,7 @@
-
 /*
  * Ioannis Papapanagiotou - A new layer of MongoDB on top of Dynomite/twemproxy
+ * Copyright (C) 2015
  */
-
 
 /*
  * Dynomite - A thin, distributed replication layer for multi non-distributed storages.
@@ -54,7 +53,7 @@ mongo_parse_req(struct msg *r)
     b = STAILQ_LAST(&r->mhdr, mbuf, next);
 
     ASSERT(r->request);
-    ASSERT(r->redis==2);
+    ASSERT(r->data_store==2);
     ASSERT(state >= SW_START && state < SW_SENTINEL);
     ASSERT(b != NULL);
     ASSERT(b->pos <= b->last);
