@@ -189,11 +189,11 @@ dnode_each_init(void *elem, void *data)
     }
 
     char log_datastore = "mongo";
-    if(pool->data==0){
-    	char_logstore="redis";
+    if(pool->data_store==0){
+    	log_datastore="redis";
     }
-    else if(pool->data == 1){
-    	char_logstore="memcache";
+    else if(pool->data_store == 1){
+    	log_datastore="memcache";
    }
 
     log_debug(LOG_NOTICE, "dyn: p %d listening on '%.*s' in %s pool %"PRIu32" '%.*s'"
