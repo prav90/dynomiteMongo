@@ -33,7 +33,7 @@
 #include "dyn_proto.h"
 
 /*
- * Yannnis
+ * Yannis
  *
  * From MongoDB wire protocol specification
  *
