@@ -538,11 +538,11 @@ request_send_to_all_racks(struct msg *msg) {
     	           t == MSG_REQ_MC_DECR;
     }
 
-    /* Yannis: Need to add the Mongo messages here */
+    /* Yannis: Added the Mongo messages here */
 
-    return t == MSG_REQ_MC_SET || t == MSG_REQ_MC_CAS || t == MSG_REQ_MC_DELETE || t == MSG_REQ_MC_ADD ||
-           t == MSG_REQ_MC_REPLACE || t == MSG_REQ_MC_APPEND || t == MSG_REQ_MC_PREPEND || t == MSG_REQ_MC_INCR ||
-           t == MSG_REQ_MC_DECR;
+    return t == MSG_REQ_MONGO_OP_MSG || t == MSG_REQ_MONGO_OP_UPDATE || t == MSG_REQ_MONGO_OP_INSERT || t == MSG_REQ_MONGO_RESERVED ||
+           t == MSG_REQ_MONGO_OP_QUERY || t == MSG_REQ_MONGO_OP_GET_MORE || t == MSG_REQ_MONGO_OP_GET_MORE || t == MSG_REQ_MONGO_KILL_CURSORS;
+
 }
 
 
