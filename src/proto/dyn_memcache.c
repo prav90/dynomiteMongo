@@ -170,7 +170,7 @@ memcache_parse_req(struct msg *r)
     b = STAILQ_LAST(&r->mhdr, mbuf, next);
 
     ASSERT(r->request);
-    ASSERT(r->redis==1);
+    ASSERT(r->data_store==1);
     ASSERT(state >= SW_START && state < SW_SENTINEL);
     ASSERT(b != NULL);
     ASSERT(b->pos <= b->last);
