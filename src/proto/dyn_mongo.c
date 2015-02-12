@@ -30,6 +30,7 @@
 
 #include "../dyn_core.h"
 #include "dyn_proto.h"
+#include "dyn_mongo.h"
 
 /*
  * Yannis
@@ -49,6 +50,8 @@ mongo_parse_req(struct msg *r)
         SW_SENTINEL
     }state;
 
+
+
     state = r->state;
     b = STAILQ_LAST(&r->mhdr, mbuf, next);
 
@@ -64,6 +67,7 @@ mongo_parse_req(struct msg *r)
 
     for (p = r->pos; p < b->last; p++) {
         ch = *p;
+
 
         switch (state) {
         	case SW_START:
