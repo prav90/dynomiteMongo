@@ -50,6 +50,7 @@ mongo_parse_req(struct msg *r)
         SW_SENTINEL
     }state;
 
+    MsgHeader hdr;
 
 
     state = r->state;
@@ -67,7 +68,13 @@ mongo_parse_req(struct msg *r)
 
     for (p = r->pos; p < b->last; p++) {
         ch = *p;
-
+        hdr.messageLength = nthol(ch);
+        ch += 4;
+        hdr.requestID = ntohl(ch);
+        ch += 4;
+        hdr.responseTo = ntohl(ch);
+        ch +=4;
+        hdr.opCode = ntohl(ch);
 
         switch (state) {
         	case SW_START:
@@ -88,4 +95,80 @@ mongo_parse_rsp(struct msg *r)
     uint8_t *p, *m;
     uint8_t ch;
 
+}
+
+/*
+ * Return true, if the mongo command is a delete command, otherwise
+ * return false
+ */
+static bool
+mongo_delete(struct msg *r)
+{
+    if (r->type == MSG_REQ_MONGO_DELETE) {
+        return true;
+    }
+
+    return false;
+}
+
+/*
+ * Pre-split copy handler invoked when the request is a multi vector -
+ * 'get' or 'gets' request and is about to be split into two requests
+ */
+void
+mongo_pre_splitcopy(struct mbuf *mbuf, void *arg)
+{
+
+
+
+}
+
+
+/*
+ * Post-split copy handler invoked when the request is a multi vector -
+ * GETMORE request and has already been split into two requests
+ */
+rstatus_t
+mongo_post_splitcopy(struct msg *r)
+{
+	/* Yannis: this is not complete - this an exemplar implementation */
+    struct mbuf *mbuf;
+    struct string crlf = string(CRLF);
+
+    ASSERT(r->request);
+    ASSERT(r->data_store==1);
+    ASSERT(!STAILQ_EMPTY(&r->mhdr));
+
+    mbuf = STAILQ_LAST(&r->mhdr, mbuf, next);
+    mbuf_copy(mbuf, crlf.data, crlf.len);
+
+    return DN_OK;
+}
+
+/*
+ * Pre-coalesce handler is invoked when the message is a response to
+ * the fragmented multi vector request - 'get' or 'gets' and all the
+ * responses to the fragmented request vector hasn't been received
+ */
+void
+mongo_pre_coalesce(struct msg *r)
+{
+	/* Yannis : this needs development */
+
+}
+
+
+/*
+ * Post-coalesce handler is invoked when the message is a response to
+ * the fragmented multi vector request - 'mget' or 'del' and all the
+ * responses to the fragmented request vector has been received and
+ * the fragmented request is consider to be done
+ */
+void
+mongo_post_coalesce(struct msg *r)
+{
+	/* Yannis : this needs development */
+
+
+}
 }
