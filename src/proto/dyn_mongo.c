@@ -75,6 +75,22 @@ mongo_parse_req(struct msg *r)
         hdr.responseTo = ntohl(ch);
         ch +=4;
         hdr.opCode = ntohl(ch);
+        switch(hdr.opCode) {
+        	case OP_QUERY:
+        		r->type = MSG_REQ_MONGO_OP_QUERY;
+        		break;
+        	case OP_INSERT:
+        		r->type= MSG_REQ_MONGO_OP_INSERT
+        		break;
+        	default:
+        		/* ERROR */
+        		break;
+
+        }
+
+
+
+
 
         switch (state) {
         	case SW_START:
