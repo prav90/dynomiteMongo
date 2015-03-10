@@ -24,7 +24,7 @@ struct MsgHeader {
 struct op_update {
     MsgHeader header;             // standard message header
     uint32_t     ZERO;               // 0 - reserved for future use
-    cstring   fullCollectionName; // "dbname.collectionname"
+    string   fullCollectionName; // "dbname.collectionname"
     int32     flags;              // bit vector. see below
     document  selector;           // the query to select the document
 //    document  update;             // specification of the update to perform
@@ -40,7 +40,7 @@ struct op_insert {
 struct op_query {
     MsgHeader header;                 // standard message header
     uint32_t     flags;                  // bit vector of query options.  See below for details.
-    cstring   fullCollectionName ;    // "dbname.collectionname"
+    string   fullCollectionName ;    // "dbname.collectionname"
     uint32_t     numberToSkip;           // number of documents to skip
     uint32_t     numberToReturn;         // number of documents to return
                                       //  in the first OP_REPLY batch
@@ -52,7 +52,7 @@ struct op_query {
 struct op_get_more {
     MsgHeader header;             // standard message header
     uint32_t     ZERO;               // 0 - reserved for future use
-    cstring   fullCollectionName; // "dbname.collectionname"
+    string   fullCollectionName; // "dbname.collectionname"
     uint32_t     numberToReturn;     // number of documents to return
     uint32_t     cursorID;           // cursorID from the OP_REPLY
 };
@@ -60,7 +60,7 @@ struct op_get_more {
 struct op_delete {
     MsgHeader header;             // standard message header
     uint32_t     ZERO;               // 0 - reserved for future use
-    cstring   fullCollectionName; // "dbname.collectionname"
+    string   fullCollectionName; // "dbname.collectionname"
     uint32_t     flags;              // bit vector - see below for details.
 //    document  selector;           // query object.  See below for details.
 };
@@ -68,7 +68,7 @@ struct op_delete {
 struct op_kill_cursors {
     MsgHeader header;             // standard message header
     uint32_t     ZERO;               // 0 - reserved for future use
-    cstring   fullCollectionName; // "dbname.collectionname"
+    string   fullCollectionName; // "dbname.collectionname"
     uint32_t     flags;              // bit vector - see below for details.
 //    document  selector;           // query object.  See below for details.
 };
