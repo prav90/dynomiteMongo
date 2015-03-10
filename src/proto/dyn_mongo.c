@@ -66,6 +66,9 @@ mongo_parse_req(struct msg *r)
     ASSERT(r->pos != NULL);
     ASSERT(r->pos >= b->pos && r->pos <= b->last);
 
+    /* Everyone of the fields in the MongoDB header is 4Bytes.
+     * The following is a bad implementation of pointers advancing forward.
+     */
     for (p = r->pos; p < b->last; p++) {
         ch = *p;
         hdr.messageLength = nthol(ch);
@@ -75,9 +78,34 @@ mongo_parse_req(struct msg *r)
         hdr.responseTo = ntohl(ch);
         ch +=4;
         hdr.opCode = ntohl(ch);
+
+        /* Default the type of the message to be unknown */
+        r->type = MSG_UNKNOWN;
+
         switch(hdr.opCode) {
         	case OP_QUERY:
         		r->type = MSG_REQ_MONGO_OP_QUERY;
+                r->is_read = 1;
+        		break;
+        	case OP_UPDATE:
+        		r->type = MSG_REQ_MONGO_OP_UPDATE;
+                r->is_read = 0;
+        		break;
+        	case OP_GET_MORE:
+        		r->type = MSG_REQ_MONGO_OP_GET_MORE;
+                r->is_read = 1;
+        		break;
+        	case OP_DELETE:
+        		r->type = MSG_REQ_MONGO_OP_DELETE;
+        		break;
+        	case OP_MSG:
+        	    r->type = MSG_REQ_MONGO_OP_MSG;
+        	    break;
+        	case OP_RESERVED:
+        		r->type = MSG_REQ_MONGO_RESERVED;
+        		break;
+        	case OP_KILL_CURSORS:
+        		r->type = MSG_REQ_MONGO_KILL_CURSORS;
         		break;
         	case OP_INSERT:
         		r->type= MSG_REQ_MONGO_OP_INSERT;
@@ -85,8 +113,24 @@ mongo_parse_req(struct msg *r)
         	default:
         		/* ERROR */
         		break;
-
         }
+
+        switch (r->type) {
+        	case MSG_REQ_MONGO_OP_QUERY:
+        	case MSG_REQ_MONGO_OP_UPDATE:
+        	case MSG_REQ_MONGO_OP_GET_MORE:
+        	case MSG_REQ_MONGO_OP_DELETE:
+        	case MSG_REQ_MONGO_OP_MSG:
+        	case MSG_REQ_MONGO_RESERVED:
+        	case MSG_REQ_MONGO_KILL_CURSORS:
+        	case MSG_REQ_MONGO_OP_INSERT:
+        	case MSG_UNKNOWN:
+        		goto error;
+
+            default:
+                NOT_REACHED();
+        }
+
         switch (state) {
         	case SW_START:
 
