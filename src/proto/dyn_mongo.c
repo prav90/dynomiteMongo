@@ -50,7 +50,7 @@ mongo_parse_req(struct msg *r)
         SW_SENTINEL
     }state;
 
-    MsgHeader hdr;
+    struct MsgHeader hdr;
 
 
     state = r->state;
@@ -80,18 +80,13 @@ mongo_parse_req(struct msg *r)
         		r->type = MSG_REQ_MONGO_OP_QUERY;
         		break;
         	case OP_INSERT:
-        		r->type= MSG_REQ_MONGO_OP_INSERT
+        		r->type= MSG_REQ_MONGO_OP_INSERT;
         		break;
         	default:
         		/* ERROR */
         		break;
 
         }
-
-
-
-
-
         switch (state) {
         	case SW_START:
 
@@ -101,7 +96,6 @@ mongo_parse_req(struct msg *r)
                 break;
          }
     }
-
 }
 
 void
@@ -187,4 +181,4 @@ mongo_post_coalesce(struct msg *r)
 
 
 }
-}
+

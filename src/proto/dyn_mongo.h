@@ -4,6 +4,7 @@
  */
 #include <arpa/inet.h>
 
+
 #define OP_REPLY 1
 #define OP_MSG 1000
 #define OP_UPDATE 2001
@@ -22,25 +23,25 @@ struct MsgHeader {
 };
 
 struct op_update {
-    MsgHeader header;             // standard message header
+    struct MsgHeader header;             // standard message header
     uint32_t     ZERO;               // 0 - reserved for future use
-    string   fullCollectionName; // "dbname.collectionname"
-    int32     flags;              // bit vector. see below
-    document  selector;           // the query to select the document
+    const char   *fullCollectionName; // "dbname.collectionname"
+    uint32_t      flags;              // bit vector. see below
+//    document  selector;           // the query to select the document
 //    document  update;             // specification of the update to perform
 };
 
 struct op_insert {
-    MsgHeader header;             // standard message header
+	struct MsgHeader header;             // standard message header
     uint32_t     flags;              // bit vector - see below
-    cstring   fullCollectionName; // "dbname.collectionname"
+    const char   *fullCollectionName; // "dbname.collectionname"
 //    document* documents;          // one or more documents to insert into the collection
 };
 
 struct op_query {
-    MsgHeader header;                 // standard message header
+	struct MsgHeader header;                 // standard message header
     uint32_t     flags;                  // bit vector of query options.  See below for details.
-    string   fullCollectionName ;    // "dbname.collectionname"
+    const char   *fullCollectionName ;    // "dbname.collectionname"
     uint32_t     numberToSkip;           // number of documents to skip
     uint32_t     numberToReturn;         // number of documents to return
                                       //  in the first OP_REPLY batch
@@ -50,31 +51,31 @@ struct op_query {
 };
 
 struct op_get_more {
-    MsgHeader header;             // standard message header
+	struct MsgHeader header;             // standard message header
     uint32_t     ZERO;               // 0 - reserved for future use
-    string   fullCollectionName; // "dbname.collectionname"
+    const char   *fullCollectionName; // "dbname.collectionname"
     uint32_t     numberToReturn;     // number of documents to return
     uint32_t     cursorID;           // cursorID from the OP_REPLY
 };
 
 struct op_delete {
-    MsgHeader header;             // standard message header
+	struct MsgHeader header;             // standard message header
     uint32_t     ZERO;               // 0 - reserved for future use
-    string   fullCollectionName; // "dbname.collectionname"
+    const char   *fullCollectionName; // "dbname.collectionname"
     uint32_t     flags;              // bit vector - see below for details.
 //    document  selector;           // query object.  See below for details.
 };
 
 struct op_kill_cursors {
-    MsgHeader header;             // standard message header
+	struct MsgHeader header;             // standard message header
     uint32_t     ZERO;               // 0 - reserved for future use
-    string   fullCollectionName; // "dbname.collectionname"
+    const char   *fullCollectionName; // "dbname.collectionname"
     uint32_t     flags;              // bit vector - see below for details.
 //    document  selector;           // query object.  See below for details.
 };
 
 struct op_reply {
-    MsgHeader header;         // standard message header
+	struct MsgHeader header;         // standard message header
     uint32_t     responseFlags;  // bit vector - see details below
     uint64_t     cursorID;       // cursor id if client needs to do get more's
     uint32_t     startingFrom;   // where in the cursor this reply is starting
