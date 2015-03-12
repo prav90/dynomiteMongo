@@ -32,6 +32,7 @@
 #include "dyn_proto.h"
 #include "dyn_mongo.h"
 
+
 /*
  * Yannis
  *
@@ -72,7 +73,7 @@ mongo_parse_req(struct msg *r)
      */
     for (p = r->pos; p < b->last; p++) {
         ch = *p;
-        hdr.messageLength = nthol(ch);
+        hdr.messageLength = ntohl(ch);
         ch += 4;
         hdr.requestID = ntohl(ch);
         ch += 4;
@@ -220,7 +221,7 @@ mongo_parse_rsp(struct msg *r)
 
     for (p = r->pos; p < b->last; p++) {
         ch = *p;
-        hdr.messageLength = nthol(ch);
+        hdr.messageLength = ntohl(ch);
         ch += 4;
         hdr.requestID = ntohl(ch);
         ch += 4;
