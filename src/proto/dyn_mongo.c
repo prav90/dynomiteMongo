@@ -68,6 +68,7 @@ mongo_parse_req(struct msg *r)
 
     /* Everyone of the fields in the MongoDB header is 4Bytes.
      * The following is a bad implementation of pointers advancing forward.
+     * The same issue appears in the response
      */
     for (p = r->pos; p < b->last; p++) {
         ch = *p;
@@ -139,7 +140,60 @@ mongo_parse_req(struct msg *r)
                 NOT_REACHED();
                 break;
          }
-    }
+ /* Everything else below is the same as the memcached implementation.
+  * See comments in there for further information.
+  */
+          ASSERT(p == b->last);
+          r->pos = p;
+          r->state = state;
+
+          if (b->last == b->end && r->token != NULL) {
+              r->pos = r->token;
+              r->token = NULL;
+              r->result = MSG_PARSE_REPAIR;
+          } else {
+              r->result = MSG_PARSE_AGAIN;
+          }
+
+          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req %"PRIu64" res %d "
+                      "type %d state %d rpos %d of %d", r->id, r->result, r->type,
+                      r->state, r->pos - b->pos, b->last - b->pos);
+          return;
+
+fragment:
+          ASSERT(p != b->last);
+          ASSERT(r->token != NULL);
+          r->pos = r->token;
+          r->token = NULL;
+          r->state = state;
+          r->result = MSG_PARSE_FRAGMENT;
+
+          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req %"PRIu64" res %d "
+                      "type %d state %d rpos %d of %d", r->id, r->result, r->type,
+                      r->state, r->pos - b->pos, b->last - b->pos);
+          return;
+
+done:
+          ASSERT(r->type > MSG_UNKNOWN && r->type < MSG_SENTINEL);
+          r->pos = p + 1;
+          ASSERT(r->pos <= b->last);
+          r->state = SW_START;
+          r->result = MSG_PARSE_OK;
+
+          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req %"PRIu64" res %d "
+                      "type %d state %d rpos %d of %d", r->id, r->result, r->type,
+                      r->state, r->pos - b->pos, b->last - b->pos);
+          return;
+
+error:
+          r->result = MSG_PARSE_ERROR;
+          r->state = state;
+          errno = EINVAL;
+
+          log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad req %"PRIu64" "
+                      "res %d type %d state %d", r->id, r->result, r->type,
+                      r->state);
+
 }
 
 void
@@ -148,6 +202,89 @@ mongo_parse_rsp(struct msg *r)
     struct mbuf *b;
     uint8_t *p, *m;
     uint8_t ch;
+    ASSERT(!r->request);
+    ASSERT(r->data_store==1);
+
+    ASSERT(b != NULL);
+    ASSERT(b->pos <= b->last);
+
+    /* validate the parsing marker */
+    ASSERT(r->pos != NULL);
+    ASSERT(r->pos >= b->pos && r->pos <= b->last);
+
+    for (p = r->pos; p < b->last; p++) {
+        ch = *p;
+        hdr.messageLength = nthol(ch);
+        ch += 4;
+        hdr.requestID = ntohl(ch);
+        ch += 4;
+        hdr.responseTo = ntohl(ch);
+        ch +=4;
+        hdr.opCode = ntohl(ch);
+
+        /* Default the type of the message to be unknown */
+        r->type = MSG_UNKNOWN;
+        switch(hdr.opCode) {
+        	case OP_REPLY:
+                r->type= MSG_REQ_MONGO_OP_REPLY;
+                break;
+            default:
+            /* ERROR */
+            	break;
+        }
+
+        switch (r->type) {
+        	case MSG_REQ_MONGO_OP_REPLY:
+        	case MSG_UNKNOWN:
+        		goto error;
+
+            default:
+                NOT_REACHED();
+        }
+
+    }
+    /* Everything else below is the same as the memcached implementation.
+     * See comments in there for further information.
+     */
+    ASSERT(p == b->last);
+     r->pos = p;
+     r->state = state;
+
+     if (b->last == b->end && r->token != NULL) {
+         r->pos = r->token;
+         r->token = NULL;
+         r->result = MSG_PARSE_REPAIR;
+     } else {
+         r->result = MSG_PARSE_AGAIN;
+     }
+
+     log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp %"PRIu64" res %d "
+                 "type %d state %d rpos %d of %d", r->id, r->result, r->type,
+                 r->state, r->pos - b->pos, b->last - b->pos);
+     return;
+
+ done:
+     ASSERT(r->type > MSG_UNKNOWN && r->type < MSG_SENTINEL);
+     r->pos = p + 1;
+     ASSERT(r->pos <= b->last);
+     r->state = SW_START;
+     r->token = NULL;
+     r->result = MSG_PARSE_OK;
+
+     log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp %"PRIu64" res %d "
+                 "type %d state %d rpos %d of %d", r->id, r->result, r->type,
+                 r->state, r->pos - b->pos, b->last - b->pos);
+     return;
+
+ error:
+     r->result = MSG_PARSE_ERROR;
+     r->state = state;
+     errno = EINVAL;
+
+     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad rsp %"PRIu64" "
+                 "res %d type %d state %d", r->id, r->result, r->type,
+                 r->state);
+
 
 }
 
