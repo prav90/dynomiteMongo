@@ -102,7 +102,7 @@ mongo_parse_req(struct msg *r)
         	    r->type = MSG_REQ_MONGO_OP_MSG;
         	    break;
         	case OP_RESERVED:
-        		r->type = MSG_REQ_MONGO_RESERVED;
+        		r->type = MSG_REQ_MONGO_OP_RESERVED;
         		break;
         	case OP_KILL_CURSORS:
         		r->type = MSG_REQ_MONGO_KILL_CURSORS;
