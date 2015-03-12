@@ -103,7 +103,7 @@ mongo_parse_req(struct msg *r)
         	    r->type = MSG_REQ_MONGO_OP_MSG;
         	    break;
         	case OP_RESERVED:
-        		r->type = MSG_REQ_MONGO_OP_RESERVED;
+        		r->type = MSG_REQ_MONGO_RESERVED;
         		break;
         	case OP_KILL_CURSORS:
         		r->type = MSG_REQ_MONGO_KILL_CURSORS;
@@ -140,20 +140,21 @@ mongo_parse_req(struct msg *r)
                 NOT_REACHED();
                 break;
          }
+    }
  /* Everything else below is the same as the memcached implementation.
   * See comments in there for further information.
   */
-          ASSERT(p == b->last);
-          r->pos = p;
-          r->state = state;
+  ASSERT(p == b->last);
+  r->pos = p;
+  r->state = state;
 
-          if (b->last == b->end && r->token != NULL) {
+  if (b->last == b->end && r->token != NULL) {
               r->pos = r->token;
               r->token = NULL;
               r->result = MSG_PARSE_REPAIR;
-          } else {
+  } else {
               r->result = MSG_PARSE_AGAIN;
-          }
+  }
 
           log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req %"PRIu64" res %d "
                       "type %d state %d rpos %d of %d", r->id, r->result, r->type,
@@ -204,6 +205,11 @@ mongo_parse_rsp(struct msg *r)
     uint8_t ch;
     ASSERT(!r->request);
     ASSERT(r->data_store==1);
+    struct MsgHeader hdr;
+
+    enum {
+            SW_START,
+        } state;
 
     ASSERT(b != NULL);
     ASSERT(b->pos <= b->last);
@@ -226,7 +232,7 @@ mongo_parse_rsp(struct msg *r)
         r->type = MSG_UNKNOWN;
         switch(hdr.opCode) {
         	case OP_REPLY:
-                r->type= MSG_REQ_MONGO_OP_REPLY;
+                r->type= MSG_RSP_MONGO_OP_REPLY;
                 break;
             default:
             /* ERROR */
@@ -234,7 +240,7 @@ mongo_parse_rsp(struct msg *r)
         }
 
         switch (r->type) {
-        	case MSG_REQ_MONGO_OP_REPLY:
+        	case MSG_RSP_MONGO_OP_REPLY:
         	case MSG_UNKNOWN:
         		goto error;
 
@@ -295,7 +301,7 @@ mongo_parse_rsp(struct msg *r)
 static bool
 mongo_delete(struct msg *r)
 {
-    if (r->type == MSG_REQ_MONGO_DELETE) {
+    if (r->type == MSG_REQ_MONGO_OP_DELETE) {
         return true;
     }
 
