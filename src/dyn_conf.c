@@ -80,7 +80,7 @@ static struct command conf_commands[] = {
       offsetof(struct conf_pool, client_connections) },
 
     { string("data_store"),
-      conf_set_bool,
+      conf_set_num,
       offsetof(struct conf_pool, data_store) },
 
     { string("preconnect"),
