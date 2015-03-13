@@ -67,22 +67,25 @@ mongo_parse_req(struct msg *r)
     ASSERT(r->pos != NULL);
     ASSERT(r->pos >= b->pos && r->pos <= b->last);
 
-    /* Everyone of the fields in the MongoDB header is 4Bytes.
-     * The following is a bad implementation of pointers advancing forward.
-     * The same issue appears in the response
+    /* Every one of the fields in the MongoDB header is 4Bytes.
      */
-    for (p = r->pos; p < b->last; p++) {
-        ch = *p;
-        hdr.messageLength = ntohl(ch);
-        ch += 4;
-        hdr.requestID = ntohl(ch);
-        ch += 4;
-        hdr.responseTo = ntohl(ch);
-        ch +=4;
-        hdr.opCode = ntohl(ch);
+    p = r->pos;
+    m = p;
 
-        /* Default the type of the message to be unknown */
-        r->type = MSG_UNKNOWN;
+    memcpy(&hdr.messageLength, p, 4);
+    hdr.messageLength = ntohl(hdr.messageLength);
+    p += 4;
+    memcpy(&hdr.requestID, p, 4);
+    hdr.requestID = ntohl(hdr.requestID);
+    p += 4;
+    memcpy(&hdr.responseTo, p, 4);
+    hdr.requestID = ntohl(hdr.requestID);
+    p += 4;
+    memcpy(&hdr.opCode, p, 4);
+    hdr.requestID = ntohl(hdr.requestID);
+
+    /* Default the type of the message to be unknown */
+    r->type = MSG_UNKNOWN;
 
         switch(hdr.opCode) {
         	case OP_QUERY:
@@ -141,13 +144,11 @@ mongo_parse_req(struct msg *r)
                 NOT_REACHED();
                 break;
          }
-    }
- /* Everything else below is the same as the memcached implementation.
-  * See comments in there for further information.
-  */
-  ASSERT(p == b->last);
+
   r->pos = p;
   r->state = state;
+  /* Move b to the end of the message by adding the beginning plus the message length */
+  b->last = m + hdr.messageLength;
 
   if (b->last == b->end && r->token != NULL) {
               r->pos = r->token;
@@ -212,6 +213,9 @@ mongo_parse_rsp(struct msg *r)
             SW_START,
         } state;
 
+   state = r->state;
+   b = STAILQ_LAST(&r->mhdr, mbuf, next);
+
     ASSERT(b != NULL);
     ASSERT(b->pos <= b->last);
 
@@ -219,15 +223,22 @@ mongo_parse_rsp(struct msg *r)
     ASSERT(r->pos != NULL);
     ASSERT(r->pos >= b->pos && r->pos <= b->last);
 
-    for (p = r->pos; p < b->last; p++) {
-        ch = *p;
-        hdr.messageLength = ntohl(ch);
-        ch += 4;
-        hdr.requestID = ntohl(ch);
-        ch += 4;
-        hdr.responseTo = ntohl(ch);
-        ch +=4;
-        hdr.opCode = ntohl(ch);
+    /* Every one of the fields in the MongoDB header is 4Bytes.
+     */
+    p = r->pos;
+    m = p;
+
+    memcpy(&hdr.messageLength, p, 4);
+    hdr.messageLength = ntohl(hdr.messageLength);
+    p += 4;
+    memcpy(&hdr.requestID, p, 4);
+    hdr.requestID = ntohl(hdr.requestID);
+    p += 4;
+    memcpy(&hdr.responseTo, p, 4);
+    hdr.requestID = ntohl(hdr.requestID);
+    p += 4;
+    memcpy(&hdr.opCode, p, 4);
+    hdr.requestID = ntohl(hdr.requestID);
 
         /* Default the type of the message to be unknown */
         r->type = MSG_UNKNOWN;
@@ -249,13 +260,11 @@ mongo_parse_rsp(struct msg *r)
                 NOT_REACHED();
         }
 
-    }
-    /* Everything else below is the same as the memcached implementation.
-     * See comments in there for further information.
-     */
-    ASSERT(p == b->last);
-     r->pos = p;
-     r->state = state;
+    r->pos = p;
+    r->state = state;
+    /* Move b to the end of the message by adding the beginning plus the message length */
+    b->last = m + hdr.messageLength;
+
 
      if (b->last == b->end && r->token != NULL) {
          r->pos = r->token;
