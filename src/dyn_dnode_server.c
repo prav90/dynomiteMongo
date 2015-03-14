@@ -187,7 +187,7 @@ dnode_each_init(void *elem, void *data)
         p->close(pool->ctx, p);
         return status;
     }
-
+    // YANNIS: determining which to write to the debug
     char log_datastore = "mongo";
     if(pool->data_store==0){
     	log_datastore="redis";

@@ -206,16 +206,13 @@ proxy_each_init(void *elem, void *data)
 
 
     // YANNIS: determining which to write to the debug
-    char logging_datastore = "mongo";
+    char log_datastore = "mongo";
     if(pool->data_store==0){
-    	logging_datastore = "redis";
+    	log_datastore="redis";
     }
-    else if(pool->data_store==1){
-    	logging_datastore = "memcache";
-    }
-    else{
-    	logging_datastore = "mongo";
-    }
+    else if(pool->data_store == 1){
+    	log_datastore="memcache";
+   }
 
     log_debug(LOG_NOTICE, "p %d listening on '%.*s' in %s pool %"PRIu32" '%.*s'"
                   " with %"PRIu32" servers", p->sd, pool->addrstr.len,
