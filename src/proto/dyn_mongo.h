@@ -2,9 +2,6 @@
  * Ioannis Papapanagiotou - MongoHeader
  * Copyright (C) 2015
  */
-#include <arpa/inet.h>
-
-
 #define OP_REPLY 1
 #define OP_MSG 1000
 #define OP_UPDATE 2001

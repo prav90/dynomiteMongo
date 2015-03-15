@@ -73,16 +73,12 @@ mongo_parse_req(struct msg *r)
     m = p;
 
     memcpy(&hdr.messageLength, p, 4);
-    hdr.messageLength = ntohl(hdr.messageLength);
     p += 4;
     memcpy(&hdr.requestID, p, 4);
-    hdr.requestID = ntohl(hdr.requestID);
     p += 4;
     memcpy(&hdr.responseTo, p, 4);
-    hdr.responseTo = ntohl(hdr.responseTo);
     p += 4;
     memcpy(&hdr.opCode, p, 4);
-    hdr.opCode = ntohl(hdr.opCode);
 
     /* Default the type of the message to be unknown */
     r->type = MSG_UNKNOWN;
@@ -193,7 +189,7 @@ error:
           r->state = state;
           errno = EINVAL;
 
-          log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad req %"PRIu64" "
+          log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "MONGO REQUEST: parsed bad req %"PRIu64" "
                       "res %d type %d state %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
                       r->state, hdr.messageLength, hdr.opCode);
 
@@ -230,16 +226,12 @@ mongo_parse_rsp(struct msg *r)
     m = p;
 
     memcpy(&hdr.messageLength, p, 4);
-    hdr.messageLength = ntohl(hdr.messageLength);
     p += 4;
     memcpy(&hdr.requestID, p, 4);
-    hdr.requestID = ntohl(hdr.requestID);
     p += 4;
     memcpy(&hdr.responseTo, p, 4);
-    hdr.responseTo = ntohl(hdr.responseTo);
     p += 4;
     memcpy(&hdr.opCode, p, 4);
-    hdr.opCode = ntohl(hdr.opCode);
 
         /* Default the type of the message to be unknown */
         r->type = MSG_UNKNOWN;
@@ -298,7 +290,7 @@ mongo_parse_rsp(struct msg *r)
      r->state = state;
      errno = EINVAL;
 
-     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad req %"PRIu64" "
+     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "MONGO RESPONSE: parsed bad req %"PRIu64" "
                  "res %d type %d state %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
                  r->state, hdr.messageLength, hdr.opCode);
 
