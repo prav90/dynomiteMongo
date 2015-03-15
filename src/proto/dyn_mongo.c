@@ -178,9 +178,9 @@ done:
           r->state = SW_START;
           r->result = MSG_PARSE_OK;
 
-          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req %"PRIu64" res %d "
-                      "type %d state %d rpos %d of %d", r->id, r->result, r->type,
-                      r->state, r->pos - b->pos, b->last - b->pos);
+          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "Mongo parsed req %"PRIu64" res %d "
+                      "type %d state %d rpos %d of %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
+                      r->state, r->pos - b->pos, b->last - b->pos, hdr.messageLength, hdr.opCode);
           return;
 
 error:
@@ -188,9 +188,9 @@ error:
           r->state = state;
           errno = EINVAL;
 
-          log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "MONGO REQUEST: parsed bad req %"PRIu64" "
-                      "res %d type %d state %d Mongo header length %zu and OP CODE: %zu %d", r->id, r->result, r->type,
-                      r->state, hdr.messageLength, hdr.opCode, opa);
+          log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "Mongo: parsed bad req %"PRIu64" "
+                      "res %d type %d state %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
+                      r->state, hdr.messageLength, hdr.opCode);
 
 }
 
