@@ -205,7 +205,7 @@ mongo_parse_rsp(struct msg *r)
     uint8_t *p, *m;
     uint8_t ch;
     ASSERT(!r->request);
-    ASSERT(r->data_store==1);
+    ASSERT(r->data_store==2);
     struct MsgHeader hdr;
 
     enum {
@@ -339,7 +339,7 @@ mongo_post_splitcopy(struct msg *r)
     struct string crlf = string(CRLF);
 
     ASSERT(r->request);
-    ASSERT(r->data_store==1);
+    ASSERT(r->data_store==2);
     ASSERT(!STAILQ_EMPTY(&r->mhdr));
 
     mbuf = STAILQ_LAST(&r->mhdr, mbuf, next);
