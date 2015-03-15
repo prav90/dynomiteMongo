@@ -194,8 +194,9 @@ error:
           errno = EINVAL;
 
           log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad req %"PRIu64" "
-                      "res %d type %d state %d", r->id, r->result, r->type,
-                      r->state);
+                      "res %d type %d state %d Mongo header length %d and OP CODE: %d", r->id, r->result, r->type,
+                      r->state, hdr.messageLength, hdr.opCode);
+
 
 }
 
@@ -297,9 +298,9 @@ mongo_parse_rsp(struct msg *r)
      r->state = state;
      errno = EINVAL;
 
-     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad rsp %"PRIu64" "
-                 "res %d type %d state %d", r->id, r->result, r->type,
-                 r->state);
+     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad req %"PRIu64" "
+                 "res %d type %d state %d Mongo header length %d and OP CODE: %d", r->id, r->result, r->type,
+                 r->state, hdr.messageLength, hdr.opCode);
 
 
 }
