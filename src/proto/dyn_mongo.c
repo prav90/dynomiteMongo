@@ -115,7 +115,6 @@ mongo_parse_req(struct msg *r)
         		/* ERROR */
         		break;
         }
-
         switch (r->type) {
         	case MSG_REQ_MONGO_OP_QUERY:
         	case MSG_REQ_MONGO_OP_UPDATE:
@@ -190,9 +189,8 @@ error:
           errno = EINVAL;
 
           log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "MONGO REQUEST: parsed bad req %"PRIu64" "
-                      "res %d type %d state %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
-                      r->state, hdr.messageLength, hdr.opCode);
-
+                      "res %d type %d state %d Mongo header length %zu and OP CODE: %zu %d", r->id, r->result, r->type,
+                      r->state, hdr.messageLength, hdr.opCode, opa);
 
 }
 
