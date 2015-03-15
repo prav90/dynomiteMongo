@@ -271,8 +271,8 @@ mongo_parse_rsp(struct msg *r)
      }
 
      log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp (normal) %"PRIu64" res %d "
-                 "type %d state %d rpos %d of %d", r->id, r->result, r->type,
-                 r->state, r->pos - b->pos, b->last - b->pos);
+                 "type %d state %d rpos %d of %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
+                 r->state, r->pos - b->pos, b->last - b->pos,hdr.messageLength, hdr.opCode);
      return;
 
  done:
