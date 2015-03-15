@@ -279,8 +279,8 @@ mongo_parse_rsp(struct msg *r)
      r->result = MSG_PARSE_OK;
 
      log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp %"PRIu64" res %d "
-                 "type %d state %d rpos %d of %d", r->id, r->result, r->type,
-                 r->state, r->pos - b->pos, b->last - b->pos);
+                 "type %d state %d rpos %d of %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
+                 r->state, r->pos - b->pos, b->last - b->pos,hdr.messageLength, hdr.opCode);
      return;
 
  error:
@@ -288,7 +288,7 @@ mongo_parse_rsp(struct msg *r)
      r->state = state;
      errno = EINVAL;
 
-     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "MONGO RESPONSE: parsed bad req %"PRIu64" "
+     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "Mongo: parsed bad rsp %"PRIu64" "
                  "res %d type %d state %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
                  r->state, hdr.messageLength, hdr.opCode);
 
