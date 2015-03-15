@@ -79,10 +79,10 @@ mongo_parse_req(struct msg *r)
     hdr.requestID = ntohl(hdr.requestID);
     p += 4;
     memcpy(&hdr.responseTo, p, 4);
-    hdr.requestID = ntohl(hdr.requestID);
+    hdr.responseTo = ntohl(hdr.responseTo);
     p += 4;
     memcpy(&hdr.opCode, p, 4);
-    hdr.requestID = ntohl(hdr.requestID);
+    hdr.opCode = ntohl(hdr.opCode);
 
     /* Default the type of the message to be unknown */
     r->type = MSG_UNKNOWN;
@@ -235,10 +235,10 @@ mongo_parse_rsp(struct msg *r)
     hdr.requestID = ntohl(hdr.requestID);
     p += 4;
     memcpy(&hdr.responseTo, p, 4);
-    hdr.requestID = ntohl(hdr.requestID);
+    hdr.responseTo = ntohl(hdr.responseTo);
     p += 4;
     memcpy(&hdr.opCode, p, 4);
-    hdr.requestID = ntohl(hdr.requestID);
+    hdr.opCode = ntohl(hdr.opCode);
 
         /* Default the type of the message to be unknown */
         r->type = MSG_UNKNOWN;
