@@ -117,13 +117,17 @@ mongo_parse_req(struct msg *r)
         }
         switch (r->type) {
         	case MSG_REQ_MONGO_OP_QUERY:
+        		break;
         	case MSG_REQ_MONGO_OP_UPDATE:
+        		break;
         	case MSG_REQ_MONGO_OP_GET_MORE:
         	case MSG_REQ_MONGO_OP_DELETE:
+        		break;
         	case MSG_REQ_MONGO_OP_MSG:
         	case MSG_REQ_MONGO_RESERVED:
         	case MSG_REQ_MONGO_KILL_CURSORS:
         	case MSG_REQ_MONGO_OP_INSERT:
+        		break;
         	case MSG_UNKNOWN:
         		goto error;
 
@@ -153,7 +157,7 @@ mongo_parse_req(struct msg *r)
               r->result = MSG_PARSE_AGAIN;
   }
 
-          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req %"PRIu64" res %d "
+          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req (normal parsing) %"PRIu64" res %d "
                       "type %d state %d rpos %d of %d", r->id, r->result, r->type,
                       r->state, r->pos - b->pos, b->last - b->pos);
           return;
@@ -166,7 +170,7 @@ fragment:
           r->state = state;
           r->result = MSG_PARSE_FRAGMENT;
 
-          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req %"PRIu64" res %d "
+          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "Mongo parsed req (fragment) %"PRIu64" res %d "
                       "type %d state %d rpos %d of %d", r->id, r->result, r->type,
                       r->state, r->pos - b->pos, b->last - b->pos);
           return;
@@ -178,7 +182,7 @@ done:
           r->state = SW_START;
           r->result = MSG_PARSE_OK;
 
-          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "Mongo parsed req %"PRIu64" res %d "
+          log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "Mongo parsed req (done) %"PRIu64" res %d "
                       "type %d state %d rpos %d of %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
                       r->state, r->pos - b->pos, b->last - b->pos, hdr.messageLength, hdr.opCode);
           return;
@@ -188,7 +192,7 @@ error:
           r->state = state;
           errno = EINVAL;
 
-          log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "Mongo: parsed bad req %"PRIu64" "
+          log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "Mongo: parsed req (error) %"PRIu64" "
                       "res %d type %d state %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
                       r->state, hdr.messageLength, hdr.opCode);
 
@@ -244,6 +248,7 @@ mongo_parse_rsp(struct msg *r)
 
         switch (r->type) {
         	case MSG_RSP_MONGO_OP_REPLY:
+        		break;
         	case MSG_UNKNOWN:
         		goto error;
 
@@ -265,7 +270,7 @@ mongo_parse_rsp(struct msg *r)
          r->result = MSG_PARSE_AGAIN;
      }
 
-     log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp %"PRIu64" res %d "
+     log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp (normal) %"PRIu64" res %d "
                  "type %d state %d rpos %d of %d", r->id, r->result, r->type,
                  r->state, r->pos - b->pos, b->last - b->pos);
      return;
@@ -278,7 +283,7 @@ mongo_parse_rsp(struct msg *r)
      r->token = NULL;
      r->result = MSG_PARSE_OK;
 
-     log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp %"PRIu64" res %d "
+     log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp (done) %"PRIu64" res %d "
                  "type %d state %d rpos %d of %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
                  r->state, r->pos - b->pos, b->last - b->pos,hdr.messageLength, hdr.opCode);
      return;
@@ -288,7 +293,7 @@ mongo_parse_rsp(struct msg *r)
      r->state = state;
      errno = EINVAL;
 
-     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "Mongo: parsed bad rsp %"PRIu64" "
+     log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "Mongo: parsed bad rsp (error) %"PRIu64" "
                  "res %d type %d state %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
                  r->state, hdr.messageLength, hdr.opCode);
 
