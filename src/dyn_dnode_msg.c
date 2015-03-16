@@ -292,8 +292,8 @@ dyn_parse_core(struct msg *r)
 	errno = EINVAL;
 
 	log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad req %"PRIu64" "
-			"res %d type %d state %d", r->id, r->result, r->type,
-			r->state);
+			"res %d type %d state %d data store %d", r->id, r->result, r->type,
+			r->state, r->data_store);
 	return false;
 
 	return true;    //fix me

@@ -148,14 +148,12 @@ mongo_parse_req(struct msg *r)
   r->state = state;
   /* Move b to the end of the message by adding the beginning plus the message length */
   b->last = m + hdr.messageLength;
+  b->end = b->last;
 
-  if (b->last == b->end && r->token != NULL) {
-        //      r->pos = r->token;
-              r->token = NULL;
-              r->result = MSG_PARSE_REPAIR;
-  } else {
-              r->result = MSG_PARSE_AGAIN;
-  }
+   if (r->token != NULL) {
+       r->token = NULL;
+       r->result = MSG_PARSE_REPAIR;
+   }
 
           log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed req (normal parsing) %"PRIu64" res %d "
                       "type %d state %d rpos %d of %d Mongo header length %zu and OP CODE: %zu", r->id, r->result, r->type,
@@ -260,14 +258,11 @@ mongo_parse_rsp(struct msg *r)
     r->state = state;
     /* Move b to the end of the message by adding the beginning plus the message length */
     b->last = m + hdr.messageLength;
+    b->end = b->last;
 
-
-     if (b->last == b->end && r->token != NULL) {
-       //  r->pos = r->token;
+     if (r->token != NULL) {
          r->token = NULL;
          r->result = MSG_PARSE_REPAIR;
-     } else {
-         r->result = MSG_PARSE_AGAIN;
      }
 
      log_hexdump(LOG_VERB, b->pos, mbuf_length(b), "parsed rsp (normal) %"PRIu64" res %d "

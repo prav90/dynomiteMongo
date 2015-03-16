@@ -1,13 +1,14 @@
 // Test application by Ioannis Papapanagiotou
-// ipapapan@purdu.edu
+// ipapapan@purdue.edu
 var Db = require('mongodb').Db;
 var Connection = require('mongodb').Connection
 var Server = require('mongodb').Server
 var format = require('util').format;
 
+
 var mongo = {
         "host": "localhost",
-        "port": "8101",
+        "port": "8102",
         "db": "mydb"
 };
 

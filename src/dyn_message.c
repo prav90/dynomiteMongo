@@ -342,6 +342,7 @@ msg_get(struct conn *conn, bool request, int data_store)
         msg->post_splitcopy = mongo_post_splitcopy;
         msg->pre_coalesce = mongo_pre_coalesce;
         msg->post_coalesce = mongo_post_coalesce;
+    	log_debug(LOG_VVERB, "YANNIS: Parsed Mongo");
 
     }
 
