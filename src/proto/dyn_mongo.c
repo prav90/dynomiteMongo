@@ -144,13 +144,13 @@ mongo_parse_req(struct msg *r)
                 break;
          }
 
-  r->pos = p;
+  r->pos = m + hdr.messageLength;
   r->state = state;
   /* Move b to the end of the message by adding the beginning plus the message length */
   b->last = m + hdr.messageLength;
 
   if (b->last == b->end && r->token != NULL) {
-              r->pos = r->token;
+        //      r->pos = r->token;
               r->token = NULL;
               r->result = MSG_PARSE_REPAIR;
   } else {
@@ -177,7 +177,7 @@ fragment:
 
 done:
           ASSERT(r->type > MSG_UNKNOWN && r->type < MSG_SENTINEL);
-          r->pos = p + 1;
+          //r->pos = p + 1;
           ASSERT(r->pos <= b->last);
           r->state = SW_START;
           r->result = MSG_PARSE_OK;
@@ -256,14 +256,14 @@ mongo_parse_rsp(struct msg *r)
                 NOT_REACHED();
         }
 
-    r->pos = p;
+    r->pos = m + hdr.messageLength;
     r->state = state;
     /* Move b to the end of the message by adding the beginning plus the message length */
     b->last = m + hdr.messageLength;
 
 
      if (b->last == b->end && r->token != NULL) {
-         r->pos = r->token;
+       //  r->pos = r->token;
          r->token = NULL;
          r->result = MSG_PARSE_REPAIR;
      } else {
@@ -277,7 +277,6 @@ mongo_parse_rsp(struct msg *r)
 
  done:
      ASSERT(r->type > MSG_UNKNOWN && r->type < MSG_SENTINEL);
-     r->pos = p + 1;
      ASSERT(r->pos <= b->last);
      r->state = SW_START;
      r->token = NULL;
@@ -316,14 +315,30 @@ mongo_delete(struct msg *r)
 
 /*
  * Pre-split copy handler invoked when the request is a multi vector -
- * 'get' or 'gets' request and is about to be split into two requests
+ * get more request and is about to be split into two requests
+ * Yannis: this is not a solution, just an example
  */
 void
 mongo_pre_splitcopy(struct mbuf *mbuf, void *arg)
 {
+    struct msg *r = arg;                  /* request vector */
 
+    ASSERT(r->request);
+    ASSERT(r->data_store==2);
+    ASSERT(mbuf_empty(mbuf));
 
+    switch (r->type) {
+    	case MSG_REQ_MONGO_OP_GET_MORE:
+    		//mbuf_copy(mbuf, get.data, get.len);
+    		break;
 
+    	default:
+            NOT_REACHED();
+    }
+
+    /* Yannis: To be done: we may want to move the mbuf
+     * mbuf->last += message length;
+     */
 }
 
 
@@ -336,14 +351,12 @@ mongo_post_splitcopy(struct msg *r)
 {
 	/* Yannis: this is not complete - this an exemplar implementation */
     struct mbuf *mbuf;
-    struct string crlf = string(CRLF);
 
     ASSERT(r->request);
     ASSERT(r->data_store==2);
     ASSERT(!STAILQ_EMPTY(&r->mhdr));
 
     mbuf = STAILQ_LAST(&r->mhdr, mbuf, next);
-    mbuf_copy(mbuf, crlf.data, crlf.len);
 
     return DN_OK;
 }

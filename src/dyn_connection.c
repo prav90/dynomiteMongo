@@ -241,7 +241,7 @@ conn_get_peer(void *owner, bool client, int data_store)
 
     conn->ref(conn, owner);
 
-    log_debug(LOG_VVERB, "get dyn peer  conn %p client %d", conn, conn->dnode_client);
+    log_debug(LOG_VVERB, "get dyn peer conn %p client %d", conn, conn->dnode_client);
 
     return conn;
 }

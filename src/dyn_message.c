@@ -324,7 +324,7 @@ msg_get(struct conn *conn, bool request, int data_store)
         msg->post_coalesce = memcache_post_coalesce;
     }
     else{
-    	/* YANNIS: Added mongo information */
+    	/* YANNIS: Added mongo parser */
         if (request) {
             if (conn->dyn_mode) {
                msg->parser = dyn_parse_req;
@@ -342,6 +342,7 @@ msg_get(struct conn *conn, bool request, int data_store)
         msg->post_splitcopy = mongo_post_splitcopy;
         msg->pre_coalesce = mongo_pre_coalesce;
         msg->post_coalesce = mongo_post_coalesce;
+
     }
 
     log_debug(LOG_VVERB, "get msg %p id %"PRIu64" request %d owner sd %d",
